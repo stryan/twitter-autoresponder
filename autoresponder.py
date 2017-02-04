@@ -3,6 +3,8 @@ import tweepy
 import json
 import os
 import pickle
+import threading
+import time
 
 class AutoResponder():
     def __init__(self,model,api, dummy):
@@ -10,6 +12,7 @@ class AutoResponder():
         self.api = api
         self.dummy = dummy
         self.name = "@saintstevebot"
+        self.auto_mode = False;
         if os.path.isfile('responded.txt'):
             with open('responded.txt','rb') as fp:
                     self.responses = pickle.load(fp)
@@ -47,27 +50,26 @@ class AutoResponder():
     def save_responses(self):
         with open("responded.txt",'wb') as fp:
             pickle.dump(self.responses,fp)
+    
+    def auto(self):
+        print "Auto mode engaged"
+        while (self.auto_mode):
+            self.new_tweet()
+            time.sleep(300)
+        print "Auto mode finished"
 
-    def main_loop(self):
-        while 1:
-            sys.stdout.write('> ')
-            cmd = raw_input()
-            if cmd == "tweet":
-                self.new_tweet()
-            if cmd == "respond":
-                self.respond_to_tweet()
-            if cmd == "current_rate":
-                json_rate = self.api.rate_limit_status()
-                print json.dumps(json_rate, indent=2)
-            if cmd == "target":
-                self.target_tweet()
-            if cmd == "toggle_dummy":
-                if self.dummy == True:
-                    self.dummy = False
-                    print "No longer in dummy mode"
-                else:
-                    self.dummy = True
-                    print "Now in dummy mode"
-            if cmd == "exit":
-                self.save_responses()
-                return    
+    def toggle_auto(self):
+        if (self.auto_mode):
+            print "Turning off auto mode"
+            self.auto_mode = False
+            return
+        self.auto_mode = True
+        return
+    def toggle_dummy(self):
+        if self.dummy == True:
+            self.dummy = False
+            print "No longer in dummy mode"
+        else:
+            self.dummy = True
+            print "Now in dummy mode"
+  
