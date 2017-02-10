@@ -9,11 +9,11 @@ import random
 from random import randint
 
 class AutoResponder():
-    def __init__(self,model,api, dummy, idb_location):
+    def __init__(self,model,api, dummy, idb_location, accountname):
         self.model = model
         self.api = api
         self.dummy = dummy
-        self.name = "@saintstevebot"
+        self.name = accountname
         self.auto_mode = False;
         self.idb_location = idb_location
         if os.path.isfile('responded.txt'):
@@ -38,8 +38,8 @@ class AutoResponder():
                 full_sentence = "@" + uname + " " + sentence
                 resp_type = randint(0,10) 
                 print "Responding with type " + str(resp_type) + ": " + full_sentence
+                self.responses.append(tweet.id) 
                 if (not self.dummy):
-                   self.responses.append(tweet.id)
                    image = self.get_image()
                    if (resp_type == 0):
                        media_ids = [self.api.media_upload(image).media_id_string] 
