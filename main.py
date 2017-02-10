@@ -81,7 +81,7 @@ def init_model():
 def main():
     api = init_twitter()
     model = init_model()
-    bot = AutoResponder(model,api, True)
+    bot = AutoResponder(model,api, False, "imagedb")
     main_t = MainThread(1, "main", bot)
     main_t.start()
     main_t.join()

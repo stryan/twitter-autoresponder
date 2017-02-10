@@ -5,14 +5,17 @@ import os
 import pickle
 import threading
 import time
+import random
+from random import randint
 
 class AutoResponder():
-    def __init__(self,model,api, dummy):
+    def __init__(self,model,api, dummy, idb_location):
         self.model = model
         self.api = api
         self.dummy = dummy
         self.name = "@saintstevebot"
         self.auto_mode = False;
+        self.idb_location = idb_location
         if os.path.isfile('responded.txt'):
             with open('responded.txt','rb') as fp:
                     self.responses = pickle.load(fp)
@@ -33,10 +36,20 @@ class AutoResponder():
                 limit = len(uname) + 2
                 sentence = self.model.make_short_sentence(140 - limit)
                 full_sentence = "@" + uname + " " + sentence
-                print "Responding with: " + full_sentence
+                resp_type = randint(0,10) 
+                print "Responding with type " + str(resp_type) + ": " + full_sentence
                 if (not self.dummy):
-                   self.responses.append(tweet.id)  
-                   self.api.update_status(full_sentence,tweet.id) 
+                   self.responses.append(tweet.id)
+                   image = self.get_image()
+                   if (resp_type == 0):
+                       media_ids = [self.api.media_upload(image).media_id_string] 
+                       self.api.update_status(full_sentence,tweet.id,media_ids=media_ids)
+                   elif (resp_type == 1):
+                       media_ids = [self.api.media_upload(image).media_id_string] 
+                       self.api.update_status("@"+uname,tweet.id,media_ids=media_ids)
+                   else:
+                       self.api.update_status(full_sentence,tweet.id) 
+                       
         return
     def target_tweet(self):
         print "Target who? "
@@ -72,4 +85,7 @@ class AutoResponder():
         else:
             self.dummy = True
             print "Now in dummy mode"
+    def get_image(self):
+        res =  random.choice(os.listdir(self.idb_location))
+        return self.idb_location + "/" + res
   
