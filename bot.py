@@ -20,7 +20,7 @@ def init_twitter():
 
 def init_model():
     filename = "tweetdb"
-    dbfile = open("tweetdb")
+    dbfile = open("/usr/local/autoresponder/tweetdb")
     db = dbfile.read()
     model = markovify.NewlineText(db)
     return model 
@@ -29,9 +29,9 @@ def main():
     print "Starting bot"
     api = init_twitter()
     model = init_model()
-    accountname = os.environ.get('accountname')
+    accountname = keys['accountname']
     print "loaded settings"
-    bot = AutoResponder(model,api, False, "imagedb", accountname)
+    bot = AutoResponder(model,api, False, "/usr/local/autoresponder/imagedb", accountname)
     print "loaded bot"
     bot.respond_to_tweet()
     now = datetime.datetime.now()
